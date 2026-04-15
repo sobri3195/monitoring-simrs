@@ -11,6 +11,16 @@ import UsersPage from './pages/UsersPage';
 import SettingsPage from './pages/SettingsPage';
 import FacilityDetailPage from './pages/FacilityDetailPage';
 import DataInputPage from './pages/DataInputPage';
+import BridgingSatusehatPage from './pages/BridgingSatusehatPage';
+import BridgingSatusehatDetailPage from './pages/BridgingSatusehatDetailPage';
+import PpraPage from './pages/PpraPage';
+import PpraDetailPage from './pages/PpraDetailPage';
+import InmIkpPage from './pages/InmIkpPage';
+import InmIkpDetailPage from './pages/InmIkpDetailPage';
+import SirsKompetensiPage from './pages/SirsKompetensiPage';
+import SirsKompetensiDetailPage from './pages/SirsKompetensiDetailPage';
+import KeuanganBulananPage from './pages/KeuanganBulananPage';
+import KeuanganBulananDetailPage from './pages/KeuanganBulananDetailPage';
 import { useAppStore } from './store/useAppStore';
 import { isAdminPuskesau } from './utils/accessControl';
 
@@ -39,6 +49,17 @@ const App = () => {
         <Route path="/users" element={<ProtectedRoute allow={adminAccess}><UsersPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute allow={adminAccess}><SettingsPage /></ProtectedRoute>} />
         <Route path="/faskes/:id" element={<ProtectedRoute allow={adminAccess}><FacilityDetailPage /></ProtectedRoute>} />
+
+        <Route path="/bridging-satusehat" element={<ProtectedRoute allow={adminAccess}><BridgingSatusehatPage /></ProtectedRoute>} />
+        <Route path="/bridging-satusehat/:id" element={<ProtectedRoute allow={adminAccess}><BridgingSatusehatDetailPage /></ProtectedRoute>} />
+        <Route path="/ppra" element={<ProtectedRoute allow={adminAccess}><PpraPage /></ProtectedRoute>} />
+        <Route path="/ppra/:id" element={<ProtectedRoute allow={adminAccess}><PpraDetailPage /></ProtectedRoute>} />
+        <Route path="/inm-ikp" element={<ProtectedRoute allow={adminAccess}><InmIkpPage /></ProtectedRoute>} />
+        <Route path="/inm-ikp/:id" element={<ProtectedRoute allow={adminAccess}><InmIkpDetailPage /></ProtectedRoute>} />
+        <Route path="/sirs-kompetensi" element={<ProtectedRoute allow={adminAccess}><SirsKompetensiPage /></ProtectedRoute>} />
+        <Route path="/sirs-kompetensi/:id" element={<ProtectedRoute allow={adminAccess}><SirsKompetensiDetailPage /></ProtectedRoute>} />
+        <Route path="/keuangan-bulanan" element={<ProtectedRoute allow={adminAccess}><KeuanganBulananPage /></ProtectedRoute>} />
+        <Route path="/keuangan-bulanan/:id" element={<ProtectedRoute allow={adminAccess}><KeuanganBulananDetailPage /></ProtectedRoute>} />
       </Routes>
     </AppLayout>
   );

@@ -1,71 +1,47 @@
-import { AlertTriangle, Building2, CheckCircle2, CircleDashed, Hospital, Stethoscope } from 'lucide-react';
-import { Cell, Pie, PieChart, ResponsiveContainer, BarChart, Bar, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import StatCard from '../components/StatCard';
-import StatusBadge from '../components/StatusBadge';
-import RiskBadge from '../components/RiskBadge';
-import { formatDate } from '../utils/formatters';
+import BridgingStatusCard from '../components/BridgingStatusCard';
+import PpraSummaryCard from '../components/PpraSummaryCard';
+import IndicatorSummaryCard from '../components/IndicatorSummaryCard';
+import SirsUpdateCard from '../components/SirsUpdateCard';
+import FinanceSummaryCard from '../components/FinanceSummaryCard';
+
+const tabs = ['Ringkasan Utama', 'Bridging SATUSEHAT', 'PPRA', 'INM & IKP', 'SIRS Kompetensi', 'Keuangan Bulanan'];
 
 const DashboardPage = () => {
-  const { facilities } = useAppStore();
-  const kpi = useMemo(() => {
-    const total = facilities.length;
-    const rsau = facilities.filter((f) => f.tipeFaskes === 'RSAU').length;
-    const fktp = facilities.filter((f) => f.tipeFaskes === 'FKTP').length;
-    const goLive = facilities.filter((f) => ['Go Live', 'Stabilisasi', 'Selesai'].includes(f.statusImplementasi)).length;
-    const onProgress = facilities.filter((f) => !['Belum Mulai', 'Selesai'].includes(f.statusImplementasi)).length;
-    const highRisk = facilities.filter((f) => f.levelRisiko === 'Tinggi').length;
-    const avg = Math.round(facilities.reduce((a, b) => a + b.progressPersen, 0) / total);
-    return { total, rsau, fktp, goLive, onProgress, highRisk, avg };
-  }, [facilities]);
+  const [tab, setTab] = useState(tabs[0]);
+  const { masterFaskes, laporanBridgingSatusehat, laporanPPRA, laporanINMIKP, laporanSIRSKompetensi, laporanKeuanganBulanan } = useAppStore();
+  const [filters, setFilters] = useState({ kotama: 'ALL', tipe: 'ALL', periode: '2026-03' });
 
-  const statusChart = useMemo(() => Object.entries(facilities.reduce((acc, f) => ({ ...acc, [f.statusImplementasi]: (acc[f.statusImplementasi] || 0) + 1 }), {})).map(([name, value]) => ({ name, value })), [facilities]);
-  const kotamaChart = useMemo(() => Object.entries(facilities.reduce((acc, f) => ({ ...acc, [f.kotama]: (acc[f.kotama] || 0) + 1 }), {})).map(([name, total]) => ({ name, total })), [facilities]);
-  const soonGoLive = [...facilities].sort((a, b) => new Date(a.targetGoLive) - new Date(b.targetGoLive)).slice(0, 8);
-  const highRiskList = facilities.filter((f) => f.levelRisiko === 'Tinggi').slice(0, 8);
-  const latestUpdate = [...facilities].sort((a, b) => new Date(b.lastUpdate) - new Date(a.lastUpdate)).slice(0, 8);
+  const faskesFiltered = useMemo(() => masterFaskes.filter((f) => (filters.kotama === 'ALL' || f.kotama === filters.kotama) && (filters.tipe === 'ALL' || f.tipeFaskes === filters.tipe)), [masterFaskes, filters]);
+  const faskesIds = new Set(faskesFiltered.map((f) => f.id));
+  const byPeriod = (rows) => rows.filter((r) => r.periode === filters.periode && faskesIds.has(r.faskesId));
+
+  const bridging = byPeriod(laporanBridgingSatusehat);
+  const ppra = byPeriod(laporanPPRA);
+  const inmikp = byPeriod(laporanINMIKP);
+  const sirs = byPeriod(laporanSIRSKompetensi);
+  const finance = byPeriod(laporanKeuanganBulanan);
+
+  const renderTab = () => {
+    if (tab === 'Bridging SATUSEHAT') return <div className="grid gap-3 md:grid-cols-4"><BridgingStatusCard title="Laporan Lengkap" value={bridging.filter((x) => x.statusPelaporan === 'Lengkap').length} /><BridgingStatusCard title="Belum Lapor" value={bridging.filter((x) => x.statusPelaporan === 'Belum Lapor').length} /><BridgingStatusCard title="Faskes Risiko Tinggi" value={bridging.filter((x) => x.statusBridgingSatusehat === 'Terkendala').length} /><BridgingStatusCard title="Butuh Pendampingan" value={bridging.filter((x) => x.kebutuhanPendampinganBridging).length} /></div>;
+    if (tab === 'PPRA') return <div className="grid gap-3 md:grid-cols-4"><PpraSummaryCard title="Laporan Lengkap" value={ppra.filter((x) => x.ppraStatusPelaporan === 'Lengkap').length} /><PpraSummaryCard title="Belum Lapor" value={ppra.filter((x) => x.ppraStatusPelaporan === 'Belum Lapor').length} /><PpraSummaryCard title="Risiko Tinggi" value={ppra.filter((x) => !x.ppraTimTersedia || !x.ppraAntibiogramTersedia).length} /><PpraSummaryCard title="Butuh Pendampingan" value={ppra.filter((x) => x.ppraKebutuhanPendampingan).length} /></div>;
+    if (tab === 'INM & IKP') return <div className="grid gap-3 md:grid-cols-4"><IndicatorSummaryCard title="Laporan Lengkap" value={inmikp.filter((x) => x.inmIkpStatusPelaporan === 'Lengkap').length} /><IndicatorSummaryCard title="Belum Lapor" value={inmikp.filter((x) => x.inmIkpStatusPelaporan === 'Belum Lapor').length} /><IndicatorSummaryCard title="Capaian Rendah" value={inmikp.filter((x) => x.inmPersenKelengkapan < 75).length} /><IndicatorSummaryCard title="Butuh Pendampingan" value={inmikp.filter((x) => x.inmKebutuhanPendampingan).length} /></div>;
+    if (tab === 'SIRS Kompetensi') return <div className="grid gap-3 md:grid-cols-4"><SirsUpdateCard title="Laporan Lengkap" value={sirs.filter((x) => x.statusPelaporan === 'Lengkap').length} /><SirsUpdateCard title="Belum Lapor" value={sirs.filter((x) => x.statusPelaporan === 'Belum Lapor').length} /><SirsUpdateCard title="Terkendala" value={sirs.filter((x) => x.sirsStatusUpdate === 'Terkendala').length} /><SirsUpdateCard title="Butuh Pendampingan" value={sirs.filter((x) => x.sirsKebutuhanPendampingan).length} /></div>;
+    if (tab === 'Keuangan Bulanan') return <div className="grid gap-3 md:grid-cols-4"><FinanceSummaryCard title="Laporan Lengkap" value={finance.filter((x) => x.financeStatusPelaporan === 'Lengkap').length} /><FinanceSummaryCard title="Belum Lapor" value={finance.filter((x) => x.financeStatusPelaporan === 'Belum Lapor').length} /><FinanceSummaryCard title="Risiko Tinggi" value={finance.filter((x) => x.financePersenRealisasiAnggaran < 70).length} /><FinanceSummaryCard title="Butuh Pendampingan" value={finance.filter((x) => x.financeKebutuhanPendampingan).length} /></div>;
+    return <div className="grid gap-3 md:grid-cols-4"><BridgingStatusCard title="Total Faskes" value={faskesFiltered.length} /><BridgingStatusCard title="RSAU" value={faskesFiltered.filter((f) => f.tipeFaskes === 'RSAU').length} /><BridgingStatusCard title="FKTP" value={faskesFiltered.filter((f) => f.tipeFaskes === 'FKTP').length} /><BridgingStatusCard title="Periode" value={filters.periode} /></div>;
+  };
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard title="Total Fasilitas" value={kpi.total} icon={Building2} />
-        <StatCard title="Total RSAU" value={kpi.rsau} icon={Hospital} />
-        <StatCard title="Total FKTP" value={kpi.fktp} icon={Stethoscope} />
-        <StatCard title="Sudah Go-Live" value={kpi.goLive} icon={CheckCircle2} />
-        <StatCard title="On Progress" value={kpi.onProgress} icon={CircleDashed} />
-        <StatCard title="Belum Mulai" value={kpi.total - kpi.onProgress - facilities.filter((f)=>f.statusImplementasi==='Selesai').length} icon={CircleDashed} />
-        <StatCard title="Risiko Tinggi" value={kpi.highRisk} icon={AlertTriangle} />
-        <StatCard title="Rata-rata Progress" value={`${kpi.avg}%`} icon={CheckCircle2} />
+      <h2 className="text-lg font-semibold">Dashboard Nasional</h2>
+      <div className="grid gap-2 rounded-xl border bg-white p-3 md:grid-cols-3">
+        <select className="rounded border px-2 py-2 text-sm" value={filters.kotama} onChange={(e) => setFilters((s) => ({ ...s, kotama: e.target.value }))}><option value="ALL">Semua Kotama</option>{[...new Set(masterFaskes.map((f) => f.kotama))].map((k) => <option key={k}>{k}</option>)}</select>
+        <select className="rounded border px-2 py-2 text-sm" value={filters.tipe} onChange={(e) => setFilters((s) => ({ ...s, tipe: e.target.value }))}><option value="ALL">Semua Tipe Faskes</option><option value="RSAU">RSAU</option><option value="FKTP">FKTP</option></select>
+        <select className="rounded border px-2 py-2 text-sm" value={filters.periode} onChange={(e) => setFilters((s) => ({ ...s, periode: e.target.value }))}><option>2026-01</option><option>2026-02</option><option>2026-03</option></select>
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <h3 className="mb-3 font-semibold text-brand-900">Distribusi Status Implementasi</h3>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={statusChart} dataKey="value" nameKey="name" outerRadius={100}>
-                  {statusChart.map((_, i) => <Cell key={i} fill={['#0ea5e9','#22c55e','#f59e0b','#ef4444','#6366f1','#14b8a6','#8b5cf6','#f97316','#10b981','#84cc16','#64748b'][i%11]} />)}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <h3 className="mb-3 font-semibold text-brand-900">Fasilitas per Kotama/Jajaran</h3>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={kotamaChart}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" hide /><YAxis /><Tooltip /><Bar dataKey="total" fill="#173b6b" /></BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="mb-2 font-semibold">Segera Go-Live</h3>{soonGoLive.map((f)=><div key={f.id} className="mb-2 rounded bg-slate-50 p-2 text-sm"><p className="font-medium">{f.namaFaskes}</p><p className="text-xs text-slate-500">Target: {formatDate(f.targetGoLive)}</p></div>)}</div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="mb-2 font-semibold">Risiko Tinggi</h3>{highRiskList.map((f)=><div key={f.id} className="mb-2 flex items-center justify-between rounded bg-slate-50 p-2 text-sm"><span>{f.namaFaskes}</span><RiskBadge risk={f.levelRisiko} /></div>)}</div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4"><h3 className="mb-2 font-semibold">Update Terbaru</h3>{latestUpdate.map((f)=><div key={f.id} className="mb-2 rounded bg-slate-50 p-2 text-sm"><p className="font-medium">{f.namaFaskes}</p><div className="flex items-center justify-between"><StatusBadge status={f.statusImplementasi} /><span className="text-xs text-slate-500">{formatDate(f.lastUpdate)}</span></div></div>)}</div>
-      </div>
+      <div className="flex flex-wrap gap-2">{tabs.map((t) => <button key={t} className={`rounded-full px-3 py-1 text-sm ${tab === t ? 'bg-brand-700 text-white' : 'bg-white border'}`} onClick={() => setTab(t)}>{t}</button>)}</div>
+      {renderTab()}
     </div>
   );
 };
