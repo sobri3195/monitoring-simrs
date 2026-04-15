@@ -31,4 +31,5 @@ Sudah tersedia `vercel.json` untuk fallback routing SPA.
 
 ## Dokumen Produk
 - PRD Sistem Laporan Inti Faskes Puskesau TNI AU: `docs/PRD-Sistem-Laporan-Inti-Faskes-Puskesau-TNI-AU.md`
+- TSD Sistem Laporan Inti Faskes Puskesau TNI AU: `docs/TSD-Sistem-Laporan-Inti-Faskes-Puskesau-TNI-AU.md`
 - Database Schema PostgreSQL: `docs/database-schema-postgresql.sql`
