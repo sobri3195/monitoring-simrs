@@ -3,25 +3,30 @@ import {
   Building2,
   Hospital,
   Stethoscope,
-  Activity,
-  Cable,
-  ListChecks,
-  AlertTriangle,
-  FileBarChart2,
   FilePenLine,
+  History,
+  Cable,
+  ShieldCheck,
+  BarChart3,
+  Database,
+  Wallet,
+  ClipboardCheck,
+  BadgeCheck,
+  AlertTriangle,
+  FolderOpen,
+  FileBarChart2,
   Users,
   Settings,
 } from 'lucide-react';
 
-export const APP_NAME = 'Dashboard Monitoring Implementasi SIMRS & SIM Klinik Puskesau TNI AU';
+export const APP_NAME = 'Sistem Laporan Inti Faskes Puskesau TNI AU';
 
 export const STATUS_IMPLEMENTASI = [
   'Belum Mulai', 'Perencanaan', 'Pengadaan', 'Instalasi', 'Konfigurasi',
   'Migrasi Data', 'Training', 'UAT', 'Go Live', 'Stabilisasi', 'Selesai',
 ];
 
-export const INTEGRATION_STATUS = ['Berhasil', 'On Progress', 'Gagal', 'Belum Mulai'];
-export const LEVEL_RISIKO = ['Rendah', 'Sedang', 'Tinggi'];
+export const MODULE_STATUS = ['Belum Lapor', 'Draft', 'Lengkap', 'Perlu Revisi'];
 
 export const USER_ROLES = [
   'Super Admin Puskesau',
@@ -34,7 +39,7 @@ export const ADMIN_PUSKESAU_ROLE = 'Super Admin Puskesau';
 
 export const MENU_GROUPS = [
   {
-    group: 'Utama',
+    group: 'Navigasi Utama',
     items: [
       { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
       {
@@ -43,31 +48,31 @@ export const MENU_GROUPS = [
         icon: Building2,
         children: [
           { label: 'Semua Faskes', path: '/master-faskes' },
-          { label: 'RSAU / RSPAU', path: '/master-faskes/rsau', icon: Hospital },
+          { label: 'RSAU', path: '/master-faskes/rsau', icon: Hospital },
           { label: 'FKTP / Klinik', path: '/master-faskes/fktp', icon: Stethoscope },
         ],
       },
       {
-        label: 'Monitoring',
-        path: '/monitoring/simrs',
-        icon: Activity,
+        label: 'Laporan Inti',
+        path: '/input-data',
+        icon: FilePenLine,
         children: [
-          { label: 'SIMRS', path: '/monitoring/simrs' },
-          { label: 'SIM Klinik', path: '/monitoring/sim-klinik' },
+          { label: 'Input Laporan Saya', path: '/input-data' },
+          { label: 'Histori Laporan', path: '/timeline' },
         ],
       },
-      { label: 'Integrasi', path: '/integrasi', icon: Cable },
-      { label: 'Timeline', path: '/timeline', icon: ListChecks },
+      { label: 'Bridging SATUSEHAT', path: '/bridging-satusehat', icon: Cable },
+      { label: 'PPRA', path: '/ppra', icon: ShieldCheck },
+      { label: 'INM & IKP', path: '/inm-ikp', icon: BarChart3 },
+      { label: 'SIRS Kompetensi', path: '/sirs-kompetensi', icon: Database },
+      { label: 'Keuangan Bulanan', path: '/keuangan-bulanan', icon: Wallet },
+      { label: 'Review Kotama', path: '/reports', icon: ClipboardCheck },
+      { label: 'Validasi Puskesau', path: '/integrasi', icon: BadgeCheck },
       { label: 'Isu & Risiko', path: '/issues', icon: AlertTriangle },
-      { label: 'Laporan', path: '/reports', icon: FileBarChart2 },
-      { label: 'Input Data', path: '/input-data', icon: FilePenLine },
-    ],
-  },
-  {
-    group: 'Administrasi',
-    items: [
-      { label: 'Users', path: '/users', icon: Users },
-      { label: 'Settings', path: '/settings', icon: Settings },
+      { label: 'Dokumen', path: '/monitoring/simrs', icon: FolderOpen },
+      { label: 'Rekap & Laporan', path: '/monitoring/sim-klinik', icon: FileBarChart2 },
+      { label: 'Manajemen User', path: '/users', icon: Users },
+      { label: 'Pengaturan', path: '/settings', icon: Settings },
     ],
   },
 ];
@@ -91,3 +96,5 @@ export const RISK_COLOR_MAP = {
   Sedang: 'bg-yellow-100 text-yellow-700',
   Tinggi: 'bg-red-100 text-red-700',
 };
+
+export const INTEGRATION_ITEM_STATUS = ['Belum Mulai', 'Proses', 'Berhasil', 'Sebagian', 'Terkendala', 'Tidak Relevan'];

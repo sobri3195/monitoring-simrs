@@ -1,0 +1,3 @@
+import SirsCompletenessBar from './SirsCompletenessBar';
+const SirsRecapTable = ({ rows }) => <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white"><table className="w-full text-sm"><thead className="bg-slate-50"><tr><th className="p-2 text-left">RSAU</th><th className="p-2 text-left">Status</th><th className="p-2 text-left">Kelengkapan</th></tr></thead><tbody>{rows.map((r) => <tr key={r.id} className="border-t"><td className="p-2">{r.namaFaskes}</td><td className="p-2">{r.sirsStatusUpdate}</td><td className="p-2"><SirsCompletenessBar value={r.completeness} /></td></tr>)}</tbody></table></div>;
+export default SirsRecapTable;
