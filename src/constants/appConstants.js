@@ -2,7 +2,7 @@ import {
   LayoutDashboard,
   Building2,
   Hospital,
-  Clinic,
+  Stethoscope,
   Activity,
   Cable,
   ListChecks,
@@ -41,7 +41,7 @@ export const MENU_GROUPS = [
         children: [
           { label: 'Semua Faskes', path: '/master-faskes' },
           { label: 'RSAU / RSPAU', path: '/master-faskes/rsau', icon: Hospital },
-          { label: 'FKTP / Klinik', path: '/master-faskes/fktp', icon: Clinic },
+          { label: 'FKTP / Klinik', path: '/master-faskes/fktp', icon: Stethoscope },
         ],
       },
       {
