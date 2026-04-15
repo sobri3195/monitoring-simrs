@@ -23,13 +23,44 @@ const DashboardPage = () => {
   const sirs = byPeriod(laporanSIRSKompetensi);
   const finance = byPeriod(laporanKeuanganBulanan);
 
+  const periodLabel = useMemo(() => {
+    const [year, month] = filters.periode.split('-');
+    return new Date(`${filters.periode}-01`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric', timeZone: 'UTC' }) || `${month}/${year}`;
+  }, [filters.periode]);
+
+  const ringkasanUtama = useMemo(() => {
+    const moduleRows = [bridging, ppra, inmikp, sirs, finance];
+    const totalLaporan = moduleRows.reduce((sum, rows) => sum + rows.length, 0);
+    const laporanLengkap = bridging.filter((x) => x.statusPelaporan === 'Lengkap').length
+      + ppra.filter((x) => x.ppraStatusPelaporan === 'Lengkap').length
+      + inmikp.filter((x) => x.inmIkpStatusPelaporan === 'Lengkap').length
+      + sirs.filter((x) => x.statusPelaporan === 'Lengkap').length
+      + finance.filter((x) => x.financeStatusPelaporan === 'Lengkap').length;
+    const kepatuhan = totalLaporan ? `${Math.round((laporanLengkap / totalLaporan) * 100)}%` : '0%';
+
+    const faskesPerluPerhatian = new Set([
+      ...bridging.filter((x) => x.statusBridgingSatusehat === 'Terkendala').map((x) => x.faskesId),
+      ...ppra.filter((x) => !x.ppraTimTersedia || !x.ppraAntibiogramTersedia).map((x) => x.faskesId),
+      ...inmikp.filter((x) => x.inmPersenKelengkapan < 75).map((x) => x.faskesId),
+      ...sirs.filter((x) => x.sirsStatusUpdate === 'Terkendala').map((x) => x.faskesId),
+      ...finance.filter((x) => x.financePersenRealisasiAnggaran < 70).map((x) => x.faskesId)
+    ]).size;
+
+    return {
+      totalFaskes: `${faskesFiltered.length} Faskes`,
+      komposisiTipe: `${faskesFiltered.filter((f) => f.tipeFaskes === 'RSAU').length} RSAU • ${faskesFiltered.filter((f) => f.tipeFaskes === 'FKTP').length} FKTP`,
+      kepatuhan,
+      faskesPerluPerhatian
+    };
+  }, [bridging, finance, faskesFiltered, inmikp, ppra, sirs]);
+
   const renderTab = () => {
     if (tab === 'Bridging SATUSEHAT') return <div className="grid gap-3 md:grid-cols-4"><BridgingStatusCard title="Laporan Lengkap" value={bridging.filter((x) => x.statusPelaporan === 'Lengkap').length} /><BridgingStatusCard title="Belum Lapor" value={bridging.filter((x) => x.statusPelaporan === 'Belum Lapor').length} /><BridgingStatusCard title="Faskes Risiko Tinggi" value={bridging.filter((x) => x.statusBridgingSatusehat === 'Terkendala').length} /><BridgingStatusCard title="Butuh Pendampingan" value={bridging.filter((x) => x.kebutuhanPendampinganBridging).length} /></div>;
     if (tab === 'PPRA') return <div className="grid gap-3 md:grid-cols-4"><PpraSummaryCard title="Laporan Lengkap" value={ppra.filter((x) => x.ppraStatusPelaporan === 'Lengkap').length} /><PpraSummaryCard title="Belum Lapor" value={ppra.filter((x) => x.ppraStatusPelaporan === 'Belum Lapor').length} /><PpraSummaryCard title="Risiko Tinggi" value={ppra.filter((x) => !x.ppraTimTersedia || !x.ppraAntibiogramTersedia).length} /><PpraSummaryCard title="Butuh Pendampingan" value={ppra.filter((x) => x.ppraKebutuhanPendampingan).length} /></div>;
     if (tab === 'INM & IKP') return <div className="grid gap-3 md:grid-cols-4"><IndicatorSummaryCard title="Laporan Lengkap" value={inmikp.filter((x) => x.inmIkpStatusPelaporan === 'Lengkap').length} /><IndicatorSummaryCard title="Belum Lapor" value={inmikp.filter((x) => x.inmIkpStatusPelaporan === 'Belum Lapor').length} /><IndicatorSummaryCard title="Capaian Rendah" value={inmikp.filter((x) => x.inmPersenKelengkapan < 75).length} /><IndicatorSummaryCard title="Butuh Pendampingan" value={inmikp.filter((x) => x.inmKebutuhanPendampingan).length} /></div>;
     if (tab === 'SIRS Kompetensi') return <div className="grid gap-3 md:grid-cols-4"><SirsUpdateCard title="Laporan Lengkap" value={sirs.filter((x) => x.statusPelaporan === 'Lengkap').length} /><SirsUpdateCard title="Belum Lapor" value={sirs.filter((x) => x.statusPelaporan === 'Belum Lapor').length} /><SirsUpdateCard title="Terkendala" value={sirs.filter((x) => x.sirsStatusUpdate === 'Terkendala').length} /><SirsUpdateCard title="Butuh Pendampingan" value={sirs.filter((x) => x.sirsKebutuhanPendampingan).length} /></div>;
     if (tab === 'Keuangan Bulanan') return <div className="grid gap-3 md:grid-cols-4"><FinanceSummaryCard title="Laporan Lengkap" value={finance.filter((x) => x.financeStatusPelaporan === 'Lengkap').length} /><FinanceSummaryCard title="Belum Lapor" value={finance.filter((x) => x.financeStatusPelaporan === 'Belum Lapor').length} /><FinanceSummaryCard title="Risiko Tinggi" value={finance.filter((x) => x.financePersenRealisasiAnggaran < 70).length} /><FinanceSummaryCard title="Butuh Pendampingan" value={finance.filter((x) => x.financeKebutuhanPendampingan).length} /></div>;
-    return <div className="grid gap-3 md:grid-cols-4"><BridgingStatusCard title="Total Faskes" value={faskesFiltered.length} /><BridgingStatusCard title="RSAU" value={faskesFiltered.filter((f) => f.tipeFaskes === 'RSAU').length} /><BridgingStatusCard title="FKTP" value={faskesFiltered.filter((f) => f.tipeFaskes === 'FKTP').length} /><BridgingStatusCard title="Periode" value={filters.periode} /></div>;
+    return <div className="grid gap-3 md:grid-cols-4"><BridgingStatusCard title="Jangkauan Layanan" value={ringkasanUtama.totalFaskes} /><BridgingStatusCard title="Komposisi Faskes" value={ringkasanUtama.komposisiTipe} /><BridgingStatusCard title="Kepatuhan Pelaporan" value={ringkasanUtama.kepatuhan} /><BridgingStatusCard title={`Perhatian Prioritas • ${periodLabel}`} value={`${ringkasanUtama.faskesPerluPerhatian} Faskes`} /></div>;
   };
 
   return (
