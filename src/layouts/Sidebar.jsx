@@ -2,9 +2,21 @@ import { ChevronDown, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { MENU_GROUPS } from '../constants/appConstants';
 import AppLogo from '../components/AppLogo';
+import { useAppStore } from '../store/useAppStore';
+import { isAdminPuskesau } from '../utils/accessControl';
 
-const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => (
-  <>
+const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
+  const { currentUser } = useAppStore();
+
+  const menuGroups = isAdminPuskesau(currentUser)
+    ? MENU_GROUPS
+    : MENU_GROUPS.map((group) => ({
+      ...group,
+      items: group.items.filter((item) => item.path === '/input-data'),
+    })).filter((group) => group.items.length > 0);
+
+  return (
+    <>
     {mobileOpen ? <div className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" onClick={() => setMobileOpen(false)} /> : null}
     <aside className={`fixed z-40 h-screen bg-brand-900 text-white transition-all lg:static ${collapsed ? 'w-20' : 'w-72'} ${mobileOpen ? 'left-0' : '-left-full lg:left-0'}`}>
       <div className="flex items-center justify-between border-b border-brand-700 px-3 py-4">
@@ -19,7 +31,7 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => (
         </div>
       </div>
       <div className="space-y-4 overflow-y-auto p-3">
-        {MENU_GROUPS.map((group) => (
+        {menuGroups.map((group) => (
           <div key={group.group}>
             {!collapsed ? <p className="mb-2 px-2 text-xs uppercase tracking-wide text-slate-300">{group.group}</p> : null}
             <div className="space-y-1">
@@ -47,6 +59,7 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => (
       </div>
     </aside>
   </>
-);
+  );
+};
 
 export default Sidebar;

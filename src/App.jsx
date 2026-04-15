@@ -10,26 +10,38 @@ import ReportsPage from './pages/ReportsPage';
 import UsersPage from './pages/UsersPage';
 import SettingsPage from './pages/SettingsPage';
 import FacilityDetailPage from './pages/FacilityDetailPage';
+import DataInputPage from './pages/DataInputPage';
+import { useAppStore } from './store/useAppStore';
+import { isAdminPuskesau } from './utils/accessControl';
 
-const App = () => (
-  <AppLayout>
-    <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/master-faskes" element={<MasterFaskesPage />} />
-      <Route path="/master-faskes/rsau" element={<MasterFaskesPage tipe="RSAU" />} />
-      <Route path="/master-faskes/fktp" element={<MasterFaskesPage tipe="FKTP" />} />
-      <Route path="/monitoring/simrs" element={<MonitoringPage jenisAplikasi="SIMRS" />} />
-      <Route path="/monitoring/sim-klinik" element={<MonitoringPage jenisAplikasi="SIM Klinik" />} />
-      <Route path="/integrasi" element={<IntegrasiPage />} />
-      <Route path="/timeline" element={<TimelinePage />} />
-      <Route path="/issues" element={<IssuesPage />} />
-      <Route path="/reports" element={<ReportsPage />} />
-      <Route path="/users" element={<UsersPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/faskes/:id" element={<FacilityDetailPage />} />
-    </Routes>
-  </AppLayout>
-);
+const ProtectedRoute = ({ allow, children }) => (allow ? children : <Navigate to="/input-data" replace />);
+
+const App = () => {
+  const { currentUser } = useAppStore();
+  const adminAccess = isAdminPuskesau(currentUser);
+
+  return (
+    <AppLayout>
+      <Routes>
+        <Route path="/" element={<Navigate to={adminAccess ? '/dashboard' : '/input-data'} replace />} />
+        <Route path="/input-data" element={<DataInputPage />} />
+
+        <Route path="/dashboard" element={<ProtectedRoute allow={adminAccess}><DashboardPage /></ProtectedRoute>} />
+        <Route path="/master-faskes" element={<ProtectedRoute allow={adminAccess}><MasterFaskesPage /></ProtectedRoute>} />
+        <Route path="/master-faskes/rsau" element={<ProtectedRoute allow={adminAccess}><MasterFaskesPage tipe="RSAU" /></ProtectedRoute>} />
+        <Route path="/master-faskes/fktp" element={<ProtectedRoute allow={adminAccess}><MasterFaskesPage tipe="FKTP" /></ProtectedRoute>} />
+        <Route path="/monitoring/simrs" element={<ProtectedRoute allow={adminAccess}><MonitoringPage jenisAplikasi="SIMRS" /></ProtectedRoute>} />
+        <Route path="/monitoring/sim-klinik" element={<ProtectedRoute allow={adminAccess}><MonitoringPage jenisAplikasi="SIM Klinik" /></ProtectedRoute>} />
+        <Route path="/integrasi" element={<ProtectedRoute allow={adminAccess}><IntegrasiPage /></ProtectedRoute>} />
+        <Route path="/timeline" element={<ProtectedRoute allow={adminAccess}><TimelinePage /></ProtectedRoute>} />
+        <Route path="/issues" element={<ProtectedRoute allow={adminAccess}><IssuesPage /></ProtectedRoute>} />
+        <Route path="/reports" element={<ProtectedRoute allow={adminAccess}><ReportsPage /></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute allow={adminAccess}><UsersPage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute allow={adminAccess}><SettingsPage /></ProtectedRoute>} />
+        <Route path="/faskes/:id" element={<ProtectedRoute allow={adminAccess}><FacilityDetailPage /></ProtectedRoute>} />
+      </Routes>
+    </AppLayout>
+  );
+};
 
 export default App;

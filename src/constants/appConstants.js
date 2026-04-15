@@ -8,6 +8,7 @@ import {
   ListChecks,
   AlertTriangle,
   FileBarChart2,
+  FilePenLine,
   Users,
   Settings,
 } from 'lucide-react';
@@ -28,6 +29,8 @@ export const USER_ROLES = [
   'Operator Faskes',
   'Viewer Pimpinan',
 ];
+
+export const ADMIN_PUSKESAU_ROLE = 'Super Admin Puskesau';
 
 export const MENU_GROUPS = [
   {
@@ -57,6 +60,7 @@ export const MENU_GROUPS = [
       { label: 'Timeline', path: '/timeline', icon: ListChecks },
       { label: 'Isu & Risiko', path: '/issues', icon: AlertTriangle },
       { label: 'Laporan', path: '/reports', icon: FileBarChart2 },
+      { label: 'Input Data', path: '/input-data', icon: FilePenLine },
     ],
   },
   {
