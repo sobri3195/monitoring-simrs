@@ -1,13 +1,14 @@
 import { ChevronDown, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { MENU_GROUPS } from '../constants/appConstants';
+import AppLogo from '../components/AppLogo';
 
 const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => (
   <>
     {mobileOpen ? <div className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" onClick={() => setMobileOpen(false)} /> : null}
     <aside className={`fixed z-40 h-screen bg-brand-900 text-white transition-all lg:static ${collapsed ? 'w-20' : 'w-72'} ${mobileOpen ? 'left-0' : '-left-full lg:left-0'}`}>
       <div className="flex items-center justify-between border-b border-brand-700 px-3 py-4">
-        {!collapsed ? <p className="text-sm font-semibold">Puskesau TNI AU</p> : <p className="mx-auto">PT</p>}
+        {!collapsed ? <AppLogo /> : <AppLogo compact />}
         <div className="flex items-center gap-1">
           <button onClick={() => setCollapsed(!collapsed)} className="hidden rounded p-1 hover:bg-brand-700 lg:block">
             {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
