@@ -27,6 +27,7 @@ export const STATUS_IMPLEMENTASI = [
 ];
 
 export const MODULE_STATUS = ['Belum Lapor', 'Draft', 'Lengkap', 'Perlu Revisi'];
+export const REPORT_WORKFLOW_STATUS = ['Draft', 'Dikirim', 'Direview', 'Perlu Revisi', 'Disetujui Kotama', 'Tervalidasi Puskesau'];
 
 export const USER_ROLES = [
   'Super Admin Puskesau',
@@ -36,6 +37,9 @@ export const USER_ROLES = [
 ];
 
 export const ADMIN_PUSKESAU_ROLE = 'Super Admin Puskesau';
+export const ADMIN_KOTAMA_ROLE = 'Admin Kotama';
+export const OPERATOR_FASKES_ROLE = 'Operator Faskes';
+export const VIEWER_PIMPINAN_ROLE = 'Viewer Pimpinan';
 
 export const MENU_GROUPS = [
   {
@@ -89,6 +93,26 @@ export const STATUS_COLOR_MAP = {
   'Go Live': 'bg-emerald-100 text-emerald-700',
   Stabilisasi: 'bg-lime-100 text-lime-700',
   Selesai: 'bg-green-100 text-green-700',
+};
+
+export const WORKFLOW_STATUS_COLOR_MAP = {
+  Draft: 'bg-slate-100 text-slate-700',
+  Dikirim: 'bg-amber-100 text-amber-700',
+  Direview: 'bg-yellow-100 text-yellow-800',
+  'Perlu Revisi': 'bg-red-100 text-red-700',
+  'Disetujui Kotama': 'bg-emerald-100 text-emerald-700',
+  'Tervalidasi Puskesau': 'bg-green-100 text-green-800',
+  Lengkap: 'bg-green-100 text-green-800',
+  'Belum Lapor': 'bg-rose-100 text-rose-700',
+};
+
+export const WORKFLOW_TRANSITION_RULES = {
+  Draft: ['Dikirim'],
+  Dikirim: ['Direview', 'Perlu Revisi'],
+  Direview: ['Perlu Revisi', 'Disetujui Kotama'],
+  'Perlu Revisi': ['Dikirim'],
+  'Disetujui Kotama': ['Tervalidasi Puskesau', 'Perlu Revisi'],
+  'Tervalidasi Puskesau': [],
 };
 
 export const RISK_COLOR_MAP = {
