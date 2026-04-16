@@ -3,17 +3,28 @@ import { NavLink } from 'react-router-dom';
 import { MENU_GROUPS } from '../constants/appConstants';
 import AppLogo from '../components/AppLogo';
 import { useAppStore } from '../store/useAppStore';
-import { isAdminPuskesau } from '../utils/accessControl';
+import { isAdminKotama, isAdminPuskesau, isOperatorFaskes, isViewerPimpinan } from '../utils/accessControl';
 
 const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
-  const { currentUser } = useAppStore();
+  const { currentUser, issues } = useAppStore();
 
-  const menuGroups = isAdminPuskesau(currentUser)
-    ? MENU_GROUPS
-    : MENU_GROUPS.map((group) => ({
-      ...group,
-      items: group.items.filter((item) => item.path === '/input-data'),
-    })).filter((group) => group.items.length > 0);
+  const buildRoleMenu = () => {
+    if (isAdminPuskesau(currentUser)) return MENU_GROUPS;
+    if (isAdminKotama(currentUser)) {
+      const allowed = ['/dashboard', '/reports', '/issues', '/bridging-satusehat', '/ppra', '/inm-ikp', '/sirs-kompetensi', '/keuangan-bulanan', '/monitoring/simrs', '/monitoring/sim-klinik'];
+      return MENU_GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => allowed.includes(item.path) || item.path === '/input-data') })).filter((group) => group.items.length);
+    }
+    if (isViewerPimpinan(currentUser)) {
+      const allowed = ['/dashboard', '/reports', '/monitoring/simrs', '/monitoring/sim-klinik', '/issues'];
+      return MENU_GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => allowed.includes(item.path)) })).filter((group) => group.items.length);
+    }
+    if (isOperatorFaskes(currentUser)) {
+      return MENU_GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => ['/input-data', '/timeline'].includes(item.path)) })).filter((group) => group.items.length);
+    }
+    return [];
+  };
+  const menuGroups = buildRoleMenu();
+  const issueCount = issues.filter((item) => item.status !== 'closed').length;
 
   return (
     <>
@@ -40,6 +51,7 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
                   <NavLink to={item.path} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-2 py-2 text-sm ${isActive ? 'bg-brand-700' : 'hover:bg-brand-700/60'}`}>
                     <item.icon size={16} />
                     {!collapsed ? <span>{item.label}</span> : null}
+                    {!collapsed && item.path === '/issues' ? <span className="ml-auto rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">{issueCount}</span> : null}
                     {!collapsed && item.children ? <ChevronDown size={14} className="ml-auto" /> : null}
                   </NavLink>
                   {!collapsed && item.children ? (

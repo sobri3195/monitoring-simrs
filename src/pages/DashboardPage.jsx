@@ -18,6 +18,8 @@ import IndicatorSummaryCard from '../components/IndicatorSummaryCard';
 import SirsUpdateCard from '../components/SirsUpdateCard';
 import FinanceSummaryCard from '../components/FinanceSummaryCard';
 import StatCard from '../components/StatCard';
+import { getModuleReports } from '../services/reportService';
+import PageHeader from '../components/PageHeader';
 
 const tabs = ['Ringkasan Utama', 'Bridging SATUSEHAT', 'PPRA', 'INM & IKP', 'SIRS Kompetensi', 'Keuangan Bulanan'];
 
@@ -56,14 +58,13 @@ const DashboardPage = () => {
     [masterFaskes, filters],
   );
   const faskesIds = new Set(faskesFiltered.map((f) => f.id));
-  const byPeriod = (rows) => rows.filter((r) => r.periode === filters.periode && faskesIds.has(r.faskesId));
-
-  const laporanInti = byPeriod(laporanPeriodikInti);
-  const bridging = byPeriod(laporanBridgingSatusehat);
-  const ppra = byPeriod(laporanPPRA);
-  const inmikp = byPeriod(laporanINMIKP);
-  const sirs = byPeriod(laporanSIRSKompetensi);
-  const finance = byPeriod(laporanKeuanganBulanan);
+  const facilityIds = [...faskesIds];
+  const laporanInti = getModuleReports({ store: { laporanPeriodikInti }, module: 'inti', period: filters.periode, facilityIds });
+  const bridging = getModuleReports({ store: { laporanBridgingSatusehat }, module: 'bridging', period: filters.periode, facilityIds });
+  const ppra = getModuleReports({ store: { laporanPPRA }, module: 'ppra', period: filters.periode, facilityIds });
+  const inmikp = getModuleReports({ store: { laporanINMIKP }, module: 'inmikp', period: filters.periode, facilityIds });
+  const sirs = getModuleReports({ store: { laporanSIRSKompetensi }, module: 'sirs', period: filters.periode, facilityIds });
+  const finance = getModuleReports({ store: { laporanKeuanganBulanan }, module: 'keuangan', period: filters.periode, facilityIds });
 
   const periodLabel = useMemo(() => {
     const [year, month] = filters.periode.split('-');
@@ -293,7 +294,11 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Dashboard Nasional</h2>
+      <PageHeader
+        title="Dashboard Nasional"
+        description="Ringkasan pelaporan, risiko, review, dan validasi seluruh faskes TNI AU."
+        breadcrumbs={[{ label: 'Dashboard' }]}
+      />
       <div className="grid gap-2 rounded-xl border bg-white p-3 md:grid-cols-3">
         <select className="rounded border px-2 py-2 text-sm" value={filters.kotama} onChange={(e) => setFilters((s) => ({ ...s, kotama: e.target.value }))}><option value="ALL">Semua Kotama</option>{[...new Set(masterFaskes.map((f) => f.kotama))].map((k) => <option key={k}>{k}</option>)}</select>
         <select className="rounded border px-2 py-2 text-sm" value={filters.tipe} onChange={(e) => setFilters((s) => ({ ...s, tipe: e.target.value }))}><option value="ALL">Semua Tipe Faskes</option><option value="RSAU">RSAU</option><option value="FKTP">FKTP</option></select>

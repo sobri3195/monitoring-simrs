@@ -5,7 +5,7 @@ import SearchInput from '../components/SearchInput';
 import { useAppStore } from '../store/useAppStore';
 
 const Header = ({ setMobileOpen }) => {
-  const { currentUser, globalSearch, setGlobalSearch } = useAppStore();
+  const { currentUser, users, setCurrentUser, globalSearch, setGlobalSearch } = useAppStore();
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
@@ -34,7 +34,11 @@ const Header = ({ setMobileOpen }) => {
             <Bell size={16} />
             <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500" />
           </button>
-          <div className="w-full rounded-md bg-slate-100 px-3 py-2 text-xs font-medium sm:w-auto">{currentUser.name}</div>
+          <select value={currentUser.id} onChange={(e) => setCurrentUser(e.target.value)} className="w-full rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-xs font-medium sm:w-auto">
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>{user.name} ({user.role})</option>
+            ))}
+          </select>
         </div>
       </div>
     </header>

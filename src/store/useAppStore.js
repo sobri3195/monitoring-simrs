@@ -56,8 +56,22 @@ export const useAppStore = create((set, get) => ({
     persist(get);
   },
   updateSubmoduleReport: (moduleKey, reportId, payload) => {
+    const moduleStatusFieldMap = {
+      laporanBridgingSatusehat: 'statusPelaporan',
+      laporanPPRA: 'ppraStatusPelaporan',
+      laporanINMIKP: 'inmIkpStatusPelaporan',
+      laporanSIRSKompetensi: 'statusPelaporan',
+      laporanKeuanganBulanan: 'financeStatusPelaporan',
+    };
     set((state) => ({
-      [moduleKey]: state[moduleKey].map((item) => (item.id === reportId ? { ...item, ...payload, lastUpdate: new Date().toISOString() } : item)),
+      [moduleKey]: state[moduleKey].map((item) => {
+        if (item.id !== reportId) return item;
+        const statusField = moduleStatusFieldMap[moduleKey];
+        const normalizedPayload = statusField && payload.statusPelaporan
+          ? { ...payload, [statusField]: payload.statusPelaporan }
+          : payload;
+        return { ...item, ...normalizedPayload, lastUpdate: new Date().toISOString() };
+      }),
     }));
     persist(get);
   },
