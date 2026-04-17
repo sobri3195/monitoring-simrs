@@ -11,11 +11,11 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
   const buildRoleMenu = () => {
     if (isAdminPuskesau(currentUser)) return MENU_GROUPS;
     if (isAdminKotama(currentUser)) {
-      const allowed = ['/dashboard', '/reports', '/issues', '/bridging-satusehat', '/ppra', '/inm-ikp', '/sirs-kompetensi', '/keuangan-bulanan', '/monitoring/simrs', '/monitoring/sim-klinik'];
+      const allowed = ['/dashboard', '/reports', '/issues', '/bridging-satusehat', '/ppra', '/inm-ikp', '/sirs-kompetensi', '/keuangan-bulanan', '/monitoring-kepatuhan', '/monitoring/simrs', '/monitoring/sim-klinik'];
       return MENU_GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => allowed.includes(item.path) || item.path === '/input-data') })).filter((group) => group.items.length);
     }
     if (isViewerPimpinan(currentUser)) {
-      const allowed = ['/dashboard', '/reports', '/monitoring/simrs', '/monitoring/sim-klinik', '/issues'];
+      const allowed = ['/dashboard', '/reports', '/monitoring/simrs', '/monitoring/sim-klinik', '/issues', '/monitoring-kepatuhan'];
       return MENU_GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => allowed.includes(item.path)) })).filter((group) => group.items.length);
     }
     if (isOperatorFaskes(currentUser)) {

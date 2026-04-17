@@ -34,12 +34,14 @@ export const USER_ROLES = [
   'Admin Kotama',
   'Operator Faskes',
   'Viewer Pimpinan',
+  'Staf Yankes / Viewer Monitoring',
 ];
 
 export const ADMIN_PUSKESAU_ROLE = 'Super Admin Puskesau';
 export const ADMIN_KOTAMA_ROLE = 'Admin Kotama';
 export const OPERATOR_FASKES_ROLE = 'Operator Faskes';
 export const VIEWER_PIMPINAN_ROLE = 'Viewer Pimpinan';
+export const VIEWER_MONITORING_ROLE = 'Staf Yankes / Viewer Monitoring';
 
 export const MENU_GROUPS = [
   {
@@ -70,6 +72,7 @@ export const MENU_GROUPS = [
       { label: 'INM & IKP', path: '/inm-ikp', icon: BarChart3 },
       { label: 'SIRS Kompetensi', path: '/sirs-kompetensi', icon: Database },
       { label: 'Keuangan Bulanan', path: '/keuangan-bulanan', icon: Wallet },
+      { label: 'Monitoring Kepatuhan RSAU', path: '/monitoring-kepatuhan', icon: ClipboardCheck },
       { label: 'Review Kotama', path: '/reports', icon: ClipboardCheck },
       { label: 'Validasi Puskesau', path: '/integrasi', icon: BadgeCheck },
       { label: 'Isu & Risiko', path: '/issues', icon: AlertTriangle },

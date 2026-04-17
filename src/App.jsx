@@ -22,9 +22,11 @@ import SirsKompetensiDetailPage from './pages/SirsKompetensiDetailPage';
 import KeuanganBulananPage from './pages/KeuanganBulananPage';
 import KeuanganBulananDetailPage from './pages/KeuanganBulananDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
+import MonitoringKepatuhanPage from './pages/MonitoringKepatuhanPage';
+import RsauComplianceDetailPage from './pages/RsauComplianceDetailPage';
 import { useAppStore } from './store/useAppStore';
 import { hasRoleAccess, isAdminPuskesau, isViewerPimpinan } from './utils/accessControl';
-import { ADMIN_KOTAMA_ROLE, ADMIN_PUSKESAU_ROLE, OPERATOR_FASKES_ROLE, VIEWER_PIMPINAN_ROLE } from './constants/appConstants';
+import { ADMIN_KOTAMA_ROLE, ADMIN_PUSKESAU_ROLE, OPERATOR_FASKES_ROLE, VIEWER_MONITORING_ROLE, VIEWER_PIMPINAN_ROLE } from './constants/appConstants';
 
 const ProtectedRoute = ({ allow, children }) => (allow ? children : <Navigate to="/input-data" replace />);
 
@@ -32,10 +34,10 @@ const App = () => {
   const { currentUser } = useAppStore();
   const adminAccess = isAdminPuskesau(currentUser);
   const viewerAccess = isViewerPimpinan(currentUser);
-  const canAccessDashboard = hasRoleAccess(currentUser, [ADMIN_PUSKESAU_ROLE, ADMIN_KOTAMA_ROLE, VIEWER_PIMPINAN_ROLE]);
+  const canAccessDashboard = hasRoleAccess(currentUser, [ADMIN_PUSKESAU_ROLE, ADMIN_KOTAMA_ROLE, VIEWER_PIMPINAN_ROLE, VIEWER_MONITORING_ROLE]);
   const canAccessReviewArea = hasRoleAccess(currentUser, [ADMIN_PUSKESAU_ROLE, ADMIN_KOTAMA_ROLE]);
   const canAccessValidationArea = hasRoleAccess(currentUser, [ADMIN_PUSKESAU_ROLE]);
-  const canAccessNationalModules = hasRoleAccess(currentUser, [ADMIN_PUSKESAU_ROLE, ADMIN_KOTAMA_ROLE, VIEWER_PIMPINAN_ROLE]);
+  const canAccessNationalModules = hasRoleAccess(currentUser, [ADMIN_PUSKESAU_ROLE, ADMIN_KOTAMA_ROLE, VIEWER_PIMPINAN_ROLE, VIEWER_MONITORING_ROLE]);
   const canInputReport = hasRoleAccess(currentUser, [OPERATOR_FASKES_ROLE, ADMIN_PUSKESAU_ROLE, ADMIN_KOTAMA_ROLE]);
 
   return (
@@ -68,6 +70,14 @@ const App = () => {
         <Route path="/sirs-kompetensi/:id" element={<ProtectedRoute allow={canAccessNationalModules}><SirsKompetensiDetailPage /></ProtectedRoute>} />
         <Route path="/keuangan-bulanan" element={<ProtectedRoute allow={canAccessNationalModules}><KeuanganBulananPage /></ProtectedRoute>} />
         <Route path="/keuangan-bulanan/:id" element={<ProtectedRoute allow={canAccessNationalModules}><KeuanganBulananDetailPage /></ProtectedRoute>} />
+
+        <Route path="/monitoring-kepatuhan" element={<ProtectedRoute allow={canAccessNationalModules}><MonitoringKepatuhanPage /></ProtectedRoute>} />
+        <Route path="/monitoring-kepatuhan/bridging" element={<ProtectedRoute allow={canAccessNationalModules}><MonitoringKepatuhanPage /></ProtectedRoute>} />
+        <Route path="/monitoring-kepatuhan/ppra" element={<ProtectedRoute allow={canAccessNationalModules}><MonitoringKepatuhanPage /></ProtectedRoute>} />
+        <Route path="/monitoring-kepatuhan/inm-ikp" element={<ProtectedRoute allow={canAccessNationalModules}><MonitoringKepatuhanPage /></ProtectedRoute>} />
+        <Route path="/monitoring-kepatuhan/sirs-kompetensi" element={<ProtectedRoute allow={canAccessNationalModules}><MonitoringKepatuhanPage /></ProtectedRoute>} />
+        <Route path="/monitoring-kepatuhan/keuangan" element={<ProtectedRoute allow={canAccessNationalModules}><MonitoringKepatuhanPage /></ProtectedRoute>} />
+        <Route path="/monitoring-kepatuhan/rsau/:id" element={<ProtectedRoute allow={canAccessNationalModules}><RsauComplianceDetailPage /></ProtectedRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AppLayout>
