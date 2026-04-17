@@ -104,6 +104,7 @@ const DataInputPage = () => {
       auditTrail: [...(currentReport.auditTrail || []), newAuditItem],
     });
 
+    localStorage.removeItem(storageKey);
     setFeedback({ type: 'success', message: action === 'draft' ? 'Draft laporan berhasil disimpan.' : 'Status laporan berhasil diperbarui.' });
   };
 

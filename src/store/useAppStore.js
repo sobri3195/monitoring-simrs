@@ -31,9 +31,14 @@ const initialState = {
 };
 
 const loadInitialState = () => {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) return JSON.parse(raw);
-  return initialState;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return initialState;
+    const parsed = JSON.parse(raw);
+    return { ...initialState, ...parsed };
+  } catch {
+    return initialState;
+  }
 };
 
 const persist = (get) => localStorage.setItem(STORAGE_KEY, JSON.stringify(get()));
@@ -79,5 +84,20 @@ export const useAppStore = create((set, get) => ({
     const user = get().users.find((u) => u.id === userId);
     if (user) set({ currentUser: user });
     persist(get);
+  },
+  resetAppData: () => {
+    set({ ...initialState });
+    persist(get);
+  },
+  exportAppData: () => JSON.stringify(get(), null, 2),
+  importAppData: (payload) => {
+    try {
+      const parsed = typeof payload === 'string' ? JSON.parse(payload) : payload;
+      set({ ...initialState, ...parsed });
+      persist(get);
+      return { ok: true };
+    } catch {
+      return { ok: false, message: 'Format JSON tidak valid.' };
+    }
   },
 }));
