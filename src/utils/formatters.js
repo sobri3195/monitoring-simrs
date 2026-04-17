@@ -21,3 +21,15 @@ export const toTitleCase = (text) =>
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
     : '';
+
+export const formatDateTime = (value) => {
+  if (!value) return '-';
+  return new Date(value).toLocaleString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+};
