@@ -19,6 +19,16 @@ npm install
 npm run dev
 ```
 
+## Script
+```bash
+npm run dev           # local development
+npm run build         # production build
+npm run preview       # preview build
+npm run lint          # lint source files
+npm run format        # format files using prettier
+npm run test:unit     # unit tests with vitest
+```
+
 ## Build production
 ```bash
 npm run build
@@ -28,8 +38,14 @@ npm run preview
 ## Deploy Vercel
 Sudah tersedia `vercel.json` untuk fallback routing SPA.
 
-
-## Dokumen Produk
-- PRD Sistem Laporan Inti Faskes Puskesau TNI AU: `docs/PRD-Sistem-Laporan-Inti-Faskes-Puskesau-TNI-AU.md`
-- TSD Sistem Laporan Inti Faskes Puskesau TNI AU: `docs/TSD-Sistem-Laporan-Inti-Faskes-Puskesau-TNI-AU.md`
+## Dokumen Produk & Engineering
+- PRD: `docs/PRD-Sistem-Laporan-Inti-Faskes-Puskesau-TNI-AU.md`
+- TSD: `docs/TSD-Sistem-Laporan-Inti-Faskes-Puskesau-TNI-AU.md`
 - Database Schema PostgreSQL: `docs/database-schema-postgresql.sql`
+- Arsitektur Aplikasi: `docs/Arsitektur-Aplikasi.md`
+- Deployment Guide: `docs/Deployment-Guide.md`
+- Security Checklist: `docs/Security-Checklist.md`
+- UX Quality Guidelines: `docs/UX-Quality-Guidelines.md`
+- Data Integration & Governance: `docs/Data-Integration-Governance.md`
+- Draft OpenAPI: `docs/openapi.yaml`
+- Gap Checklist: `docs/Gap-Checklist-Proyek.md`

@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: Monitoring SIMRS API (Draft)
+  version: 0.1.0
+servers:
+  - url: https://api.example.mil.id
+paths:
+  /api/v1/reports:
+    get:
+      summary: List reports
+      responses:
+        '200':
+          description: Success
+    post:
+      summary: Submit report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportPayload'
+      responses:
+        '201':
+          description: Created
+components:
+  schemas:
+    ReportPayload:
+      type: object
+      required: [facility_id, report_period, indicator_code, value]
+      properties:
+        facility_id:
+          type: string
+        report_period:
+          type: string
+          example: 2026-04
+        indicator_code:
+          type: string
+        value:
+          type: number
