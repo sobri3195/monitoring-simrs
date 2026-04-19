@@ -31,7 +31,9 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
   return (
     <>
       {mobileOpen ? <div className="fixed inset-0 z-30 bg-slate-950/50 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} /> : null}
-      <aside className={`fixed z-40 flex h-screen flex-col bg-gradient-to-b from-[#081a33] via-brand-900 to-[#0e2b4f] text-white transition-all duration-300 lg:static ${collapsed ? 'w-24' : 'w-80'} ${mobileOpen ? 'left-0' : '-left-full lg:left-0'}`}>
+      <aside
+        className={`fixed z-40 flex h-screen flex-col bg-gradient-to-b from-[#081a33] via-brand-900 to-[#0e2b4f] text-white transition-all duration-300 lg:static ${collapsed ? 'w-24' : 'w-[88vw] max-w-80 lg:w-80'} ${mobileOpen ? 'left-0' : '-left-full lg:left-0'}`}
+      >
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
           {!collapsed ? <AppLogo /> : <AppLogo compact />}
           <div className="flex items-center gap-1">
