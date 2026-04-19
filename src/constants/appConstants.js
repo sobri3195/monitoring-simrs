@@ -1,8 +1,6 @@
 import {
   LayoutDashboard,
-  Building2,
-  Hospital,
-  Stethoscope,
+  ClipboardCheck,
   FilePenLine,
   History,
   Cable,
@@ -10,11 +8,11 @@ import {
   BarChart3,
   Database,
   Wallet,
-  ClipboardCheck,
+  FileSearch,
   BadgeCheck,
-  AlertTriangle,
   FolderOpen,
   FileBarChart2,
+  Building2,
   Users,
   Settings,
 } from 'lucide-react';
@@ -45,39 +43,39 @@ export const VIEWER_MONITORING_ROLE = 'Staf Yankes / Viewer Monitoring';
 
 export const MENU_GROUPS = [
   {
-    group: 'Navigasi Utama',
+    group: 'Utama',
     items: [
       { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+      { label: 'Monitoring Kepatuhan RSAU', path: '/monitoring-kepatuhan', icon: ClipboardCheck },
       {
-        label: 'Master Faskes',
-        path: '/master-faskes',
-        icon: Building2,
-        children: [
-          { label: 'Semua Faskes', path: '/master-faskes' },
-          { label: 'RSAU', path: '/master-faskes/rsau', icon: Hospital },
-          { label: 'FKTP / Klinik', path: '/master-faskes/fktp', icon: Stethoscope },
-        ],
-      },
-      {
-        label: 'Laporan Inti',
+        label: 'Laporan Saya',
         path: '/input-data',
         icon: FilePenLine,
         children: [
-          { label: 'Input Laporan Saya', path: '/input-data' },
+          { label: 'Input Laporan', path: '/input-data' },
           { label: 'Histori Laporan', path: '/timeline' },
         ],
       },
+    ],
+  },
+  {
+    group: 'Modul Pelaporan',
+    items: [
       { label: 'Bridging SATUSEHAT', path: '/bridging-satusehat', icon: Cable },
       { label: 'PPRA', path: '/ppra', icon: ShieldCheck },
       { label: 'INM & IKP', path: '/inm-ikp', icon: BarChart3 },
       { label: 'SIRS Kompetensi', path: '/sirs-kompetensi', icon: Database },
       { label: 'Keuangan Bulanan', path: '/keuangan-bulanan', icon: Wallet },
-      { label: 'Monitoring Kepatuhan RSAU', path: '/monitoring-kepatuhan', icon: ClipboardCheck },
-      { label: 'Review Kotama', path: '/reports', icon: ClipboardCheck },
+    ],
+  },
+  {
+    group: 'Review & Tata Kelola',
+    items: [
+      { label: 'Review Kotama', path: '/reports', icon: FileSearch },
       { label: 'Validasi Puskesau', path: '/integrasi', icon: BadgeCheck },
-      { label: 'Isu & Risiko', path: '/issues', icon: AlertTriangle },
       { label: 'Dokumen', path: '/monitoring/simrs', icon: FolderOpen },
       { label: 'Rekap & Laporan', path: '/monitoring/sim-klinik', icon: FileBarChart2 },
+      { label: 'Master RSAU', path: '/master-faskes/rsau', icon: Building2 },
       { label: 'Manajemen User', path: '/users', icon: Users },
       { label: 'Pengaturan', path: '/settings', icon: Settings },
     ],

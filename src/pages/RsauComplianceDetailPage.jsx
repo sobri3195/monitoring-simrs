@@ -6,9 +6,11 @@ import ComplianceScoreCard from '../components/ComplianceScoreCard';
 import RsaComplianceDetailCard from '../components/RsaComplianceDetailCard';
 import ReviewerNotesCard from '../components/ReviewerNotesCard';
 import ValidationNotesCard from '../components/ValidationNotesCard';
-import AuditTrailTable from '../components/AuditTrailTable';
 import ComplianceStatusBadge from '../components/ComplianceStatusBadge';
 import { computeOverallCompliance, mergeAuditTrail } from '../utils/compliance';
+import WorkflowStepper from '../components/WorkflowStepper';
+import TimelinePanel from '../components/TimelinePanel';
+import SummarySectionCard from '../components/SummarySectionCard';
 
 const getLatest = (rows, facilityId) => rows.filter((r) => r.faskesId === facilityId).sort((a, b) => b.periode.localeCompare(a.periode))[0];
 
@@ -48,15 +50,26 @@ const RsauComplianceDetailPage = () => {
         </div>
       </div>
 
+      <WorkflowStepper currentStatus={auditTrail[0]?.event?.includes('validasi') ? 'Tervalidasi Puskesau' : moduleRows.finance?.financeStatusPelaporan || moduleRows.bridging?.statusPelaporan || 'Draft'} />
+
       <div className="grid gap-4 xl:grid-cols-2">
         <ReviewerNotesCard reviewerNotes={moduleRows.ppra?.reviewerNotes} validatorNotes={moduleRows.ppra?.validatorNotes} />
         <ValidationNotesCard notes={moduleRows.finance?.validatorNotes || moduleRows.bridging?.validatorNotes} />
       </div>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-semibold text-slate-700">Timeline Perubahan Status & Audit Trail</h3>
-        <AuditTrailTable rows={auditTrail} />
-      </section>
+      <div className="grid gap-4 xl:grid-cols-2">
+        <SummarySectionCard title="Audit Trail" subtitle="Riwayat aktivitas lintas 5 modul pelaporan.">
+          <div className="max-h-80 overflow-auto">
+            {auditTrail.length ? auditTrail.map((row) => (
+              <div key={row.id} className="border-b border-slate-100 py-2 text-xs text-slate-600">
+                <p className="font-medium text-slate-700">{row.event}</p>
+                <p>{row.by} • {new Date(row.timestamp).toLocaleString('id-ID')}</p>
+              </div>
+            )) : <p className="text-sm text-slate-500">Belum ada audit trail.</p>}
+          </div>
+        </SummarySectionCard>
+        <TimelinePanel rows={auditTrail} />
+      </div>
     </div>
   );
 };
