@@ -4,9 +4,16 @@ import SubmissionStatusCard from '../components/SubmissionStatusCard';
 import ReviewerNotesCard from '../components/ReviewerNotesCard';
 import AuditTrailTable from '../components/AuditTrailTable';
 import EmptyState from '../components/EmptyState';
+import WorkflowStepper from '../components/WorkflowStepper';
+import ProgressBar from '../components/ProgressBar';
+import FormSectionCard from '../components/FormSectionCard';
+import SummarySectionCard from '../components/SummarySectionCard';
 import { useAppStore } from '../store/useAppStore';
 import { formatDate } from '../utils/formatters';
 import { canTransitionTo } from '../utils/workflow';
+import { getCompletionState } from '../constants/workflowConstants';
+
+const formSteps = ['Ringkasan', 'Bridging SATUSEHAT', 'PPRA', 'INM & IKP', 'SIRS Kompetensi', 'Keuangan Bulanan', 'Review & Submit'];
 
 const moduleOptions = [
   { label: 'Bridging SATUSEHAT', key: 'laporanBridgingSatusehat' },
@@ -34,7 +41,7 @@ const DataInputPage = () => {
     updateSubmoduleReport,
   } = useAppStore();
 
-  const [step, setStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(formSteps[0]);
   const [moduleKey, setModuleKey] = useState(moduleOptions[0].key);
   const [facilityId, setFacilityId] = useState(masterFaskes[0]?.id || '');
   const [periode, setPeriode] = useState('2026-03');
@@ -50,6 +57,21 @@ const DataInputPage = () => {
     () => sourceMap[moduleKey].find((x) => x.faskesId === facilityId && x.periode === periode),
     [sourceMap, moduleKey, facilityId, periode],
   );
+
+  const completion = useMemo(() => {
+    let filled = 0;
+    if (selectedFacility) filled += 1;
+    if (reviewerNotes.trim()) filled += 1;
+    if (validatorNotes.trim()) filled += 1;
+    if (currentReport?.statusPelaporan) filled += 1;
+    return Math.round((filled / 4) * 100);
+  }, [currentReport?.statusPelaporan, reviewerNotes, selectedFacility, validatorNotes]);
+
+  const completionState = getCompletionState(completion);
+  const incompleteItems = [
+    !reviewerNotes.trim() ? 'Catatan reviewer belum diisi.' : null,
+    !validatorNotes.trim() ? 'Catatan validator belum diisi.' : null,
+  ].filter(Boolean);
 
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
@@ -109,14 +131,14 @@ const DataInputPage = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24">
       <PageHeader
         title="Input Laporan Saya"
-        description="Form pelaporan periodik terstandar untuk review kotama dan validasi Puskesau."
-        breadcrumbs={[{ label: 'Laporan Inti', path: '/input-data' }, { label: 'Input Laporan Saya' }]}
+        description="Workflow input operator RSAU: simpan draft, kirim, review Kotama, dan validasi final Puskesau."
+        breadcrumbs={[{ label: 'Laporan Saya', path: '/input-data' }, { label: 'Input Laporan' }]}
       />
 
-      <section className="rounded-xl border bg-white p-4 shadow-sm">
+      <SummarySectionCard title="Pengaturan Laporan" subtitle="Pilih modul, RSAU, dan periode pelaporan.">
         <div className="grid gap-3 md:grid-cols-3">
           <label className="text-sm">Submodul
             <select className="mt-1 w-full rounded-md border px-2 py-2" value={moduleKey} onChange={(e) => setModuleKey(e.target.value)}>
@@ -134,10 +156,12 @@ const DataInputPage = () => {
             </select>
           </label>
         </div>
-      </section>
+      </SummarySectionCard>
 
       {!currentReport ? <EmptyState title="Belum ada laporan" description="Pilih submodul/faskes/periode lain atau siapkan seed data laporan." /> : (
         <>
+          <WorkflowStepper currentStatus={currentReport.statusPelaporan || 'Draft'} />
+
           <div className="grid gap-4 xl:grid-cols-3">
             <div className="xl:col-span-2">
               <SubmissionStatusCard
@@ -147,63 +171,50 @@ const DataInputPage = () => {
                 lastUpdate={formatDate(currentReport.lastUpdate)}
               />
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-xs font-semibold uppercase text-slate-500">Langkah Form</p>
-              <div className="mt-2 flex gap-2 text-xs">
-                {[1, 2, 3].map((item) => (
-                  <button key={item} onClick={() => setStep(item)} className={`rounded-md px-3 py-1.5 ${step === item ? 'bg-brand-700 text-white' : 'bg-slate-100 text-slate-600'}`}>Step {item}</button>
-                ))}
-              </div>
-            </div>
+            <SummarySectionCard title="Progress Pengisian" subtitle={completionState.label}>
+              <ProgressBar value={completion} />
+              {incompleteItems.length ? (
+                <ul className="mt-3 list-disc space-y-1 pl-4 text-xs text-amber-700">
+                  {incompleteItems.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              ) : <p className="mt-2 text-xs text-emerald-700">Semua bagian penting sudah terisi.</p>}
+            </SummarySectionCard>
           </div>
 
-          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            {step === 1 ? (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-slate-700">Data Review</h3>
-                <label className="block text-sm">Catatan Reviewer
-                  <textarea required rows={4} className="mt-1 w-full rounded-md border px-3 py-2" value={reviewerNotes} onChange={(e) => setReviewerNotes(e.target.value)} placeholder="Isi catatan review dari operator/admin kotama..." />
-                </label>
-              </div>
-            ) : null}
+          <div className="flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+            {formSteps.map((item) => (
+              <button key={item} onClick={() => setActiveStep(item)} className={`rounded-full px-3 py-1 text-xs ${activeStep === item ? 'bg-brand-700 text-white' : 'bg-slate-100 text-slate-600'}`}>{item}</button>
+            ))}
+          </div>
 
-            {step === 2 ? (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-slate-700">Data Validasi</h3>
-                <label className="block text-sm">Catatan Validator
-                  <textarea rows={4} className="mt-1 w-full rounded-md border px-3 py-2" value={validatorNotes} onChange={(e) => setValidatorNotes(e.target.value)} placeholder="Isi catatan validasi puskesau..." />
-                </label>
-              </div>
-            ) : null}
-
-            {step === 3 ? (
-              <div className="space-y-3 text-sm">
-                <h3 className="text-sm font-semibold text-slate-700">Ringkasan Sebelum Submit</h3>
-                <p><span className="text-slate-500">Faskes:</span> {selectedFacility?.namaFaskes}</p>
-                <p><span className="text-slate-500">Submodul:</span> {moduleOptions.find((x) => x.key === moduleKey)?.label}</p>
-                <p><span className="text-slate-500">Reviewer Notes:</span> {reviewerNotes || '-'}</p>
-                <p><span className="text-slate-500">Validator Notes:</span> {validatorNotes || '-'}</p>
-              </div>
-            ) : null}
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button className="rounded-md bg-slate-700 px-3 py-2 text-sm text-white" onClick={() => saveWithAction('draft')}>Simpan Draft</button>
-              <button className="rounded-md bg-brand-700 px-3 py-2 text-sm text-white" onClick={() => saveWithAction('submit')}>Kirim Laporan</button>
-              <button className="rounded-md bg-emerald-700 px-3 py-2 text-sm text-white" onClick={() => saveWithAction('verify')}>Ajukan Verifikasi</button>
+          <FormSectionCard title={activeStep} description="Form ditampilkan bertahap agar operator lebih fokus dan tidak kelelahan.">
+            <div className="space-y-3">
+              <label className="block text-sm">Catatan Reviewer <span className="text-red-600">*</span>
+                <textarea rows={4} className="mt-1 w-full rounded-md border px-3 py-2" value={reviewerNotes} onChange={(e) => setReviewerNotes(e.target.value)} placeholder="Isi catatan review dari operator/admin kotama..." />
+              </label>
+              <label className="block text-sm">Catatan Validator <span className="text-red-600">*</span>
+                <textarea rows={4} className="mt-1 w-full rounded-md border px-3 py-2" value={validatorNotes} onChange={(e) => setValidatorNotes(e.target.value)} placeholder="Isi catatan validasi puskesau..." />
+              </label>
             </div>
-
-            {feedback.message ? <p className={`mt-3 text-sm ${feedback.type === 'error' ? 'text-red-700' : feedback.type === 'success' ? 'text-emerald-700' : 'text-slate-700'}`}>{feedback.message}</p> : null}
-          </section>
+          </FormSectionCard>
 
           <div className="grid gap-4 xl:grid-cols-2">
             <ReviewerNotesCard reviewerNotes={reviewerNotes} validatorNotes={validatorNotes} />
-            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <h3 className="mb-3 text-sm font-semibold text-slate-700">Audit Trail</h3>
+            <SummarySectionCard title="Audit Trail" subtitle="Riwayat perubahan status dan catatan laporan.">
               <AuditTrailTable rows={currentReport.auditTrail || []} />
-            </section>
+            </SummarySectionCard>
           </div>
         </>
       )}
+
+      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur lg:left-72">
+        <div className="mx-auto flex max-w-7xl flex-wrap justify-end gap-2">
+          <button className="rounded-md bg-slate-700 px-3 py-2 text-sm text-white" onClick={() => saveWithAction('draft')}>Simpan Draft</button>
+          <button className="rounded-md bg-brand-700 px-3 py-2 text-sm text-white" onClick={() => saveWithAction('submit')}>Kirim Laporan</button>
+          <button className="rounded-md bg-emerald-700 px-3 py-2 text-sm text-white" onClick={() => saveWithAction('verify')}>Ajukan Verifikasi</button>
+          {feedback.message ? <p className={`self-center text-sm ${feedback.type === 'error' ? 'text-red-700' : feedback.type === 'success' ? 'text-emerald-700' : 'text-slate-700'}`}>{feedback.message}</p> : null}
+        </div>
+      </div>
     </div>
   );
 };
