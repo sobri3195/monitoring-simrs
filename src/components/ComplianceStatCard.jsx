@@ -1,8 +1,11 @@
-const ComplianceStatCard = ({ title, value, subtitle }) => (
-  <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-    <p className="text-xs uppercase tracking-wide text-slate-500">{title}</p>
-    <p className="mt-2 text-2xl font-semibold text-slate-800">{value}</p>
-    {subtitle ? <p className="text-xs text-slate-500">{subtitle}</p> : null}
+import { ShieldCheck } from 'lucide-react';
+import StatCard from './StatCard';
+import ComplianceBadge from './ComplianceBadge';
+
+const ComplianceStatCard = ({ title, value, subtitle, score }) => (
+  <div className="space-y-2">
+    <StatCard title={title} value={value} subtitle={subtitle} icon={ShieldCheck} tone="info" />
+    {score !== undefined ? <ComplianceBadge score={score} /> : null}
   </div>
 );
 

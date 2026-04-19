@@ -1,20 +1,22 @@
 import {
-  LayoutDashboard,
-  ClipboardCheck,
-  FilePenLine,
-  History,
-  Cable,
-  ShieldCheck,
-  BarChart3,
-  Database,
-  Wallet,
-  FileSearch,
+  Activity,
   BadgeCheck,
-  FolderOpen,
-  FileBarChart2,
+  BarChart3,
   Building2,
-  Users,
+  Cable,
+  ClipboardCheck,
+  Database,
+  FileBarChart2,
+  FilePenLine,
+  FileSearch,
+  FolderOpen,
+  History,
+  LayoutDashboard,
+  ShieldAlert,
   Settings,
+  ShieldCheck,
+  Users,
+  Wallet,
 } from 'lucide-react';
 
 export const APP_NAME = 'Sistem Laporan Inti Faskes Puskesau TNI AU';
@@ -43,7 +45,7 @@ export const VIEWER_MONITORING_ROLE = 'Staf Yankes / Viewer Monitoring';
 
 export const MENU_GROUPS = [
   {
-    group: 'Utama',
+    group: 'Monitoring Utama',
     items: [
       { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
       { label: 'Monitoring Kepatuhan RSAU', path: '/monitoring-kepatuhan', icon: ClipboardCheck },
@@ -73,9 +75,10 @@ export const MENU_GROUPS = [
     items: [
       { label: 'Review Kotama', path: '/reports', icon: FileSearch },
       { label: 'Validasi Puskesau', path: '/integrasi', icon: BadgeCheck },
+      { label: 'Isu & Risiko', path: '/issues', icon: ShieldAlert },
       { label: 'Dokumen', path: '/monitoring/simrs', icon: FolderOpen },
       { label: 'Rekap & Laporan', path: '/monitoring/sim-klinik', icon: FileBarChart2 },
-      { label: 'Master RSAU', path: '/master-faskes/rsau', icon: Building2 },
+      { label: 'Master RSAU / Master Faskes', path: '/master-faskes/rsau', icon: Building2 },
       { label: 'Manajemen User', path: '/users', icon: Users },
       { label: 'Pengaturan', path: '/settings', icon: Settings },
     ],
@@ -123,3 +126,29 @@ export const RISK_COLOR_MAP = {
 };
 
 export const INTEGRATION_ITEM_STATUS = ['Belum Mulai', 'Proses', 'Berhasil', 'Sebagian', 'Terkendala', 'Tidak Relevan'];
+
+export const DASHBOARD_TABS = ['Ringkasan Utama', 'Bridging SATUSEHAT', 'PPRA', 'INM & IKP', 'SIRS Kompetensi', 'Keuangan Bulanan'];
+
+export const DASHBOARD_PERIOD_OPTIONS = ['2026-01', '2026-02', '2026-03'];
+
+export const DASHBOARD_STATUS_COLORS = {
+  'Belum Lapor': '#ef4444',
+  Draft: '#f59e0b',
+  Lengkap: '#22c55e',
+  'Perlu Revisi': '#a855f7',
+};
+
+export const DASHBOARD_IMPLEMENTATION_COLORS = ['#0ea5e9', '#f59e0b', '#22c55e', '#ef4444'];
+export const CHART_SERIES = ['Belum Lapor', 'Draft', 'Lengkap', 'Perlu Revisi'];
+
+export const SIDEBAR_FOOTER_TEXT = {
+  title: 'Portal Monitoring Nasional',
+  subtitle: 'Puskesau TNI AU',
+};
+
+export const NAVIGATION_FOOTER = {
+  title: 'Unit Kerja Aktif',
+  subtitle: 'Direktorat Yankesau',
+  icon: Activity,
+  shortcut: History,
+};
